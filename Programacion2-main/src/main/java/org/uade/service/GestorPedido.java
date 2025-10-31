@@ -107,26 +107,43 @@ public class GestorPedido {
     }
 
     public void ingresarPedido(Scanner sc) {
-        System.out.println("Nombre del cliente:");
-        sc.nextLine(); // limpiar fin de línea previo
+        sc.nextLine(); // limpiar salto de línea previo
+
+        System.out.println("\n=== NUEVO PEDIDO ===");
+        System.out.print("Nombre del cliente: ");
         String nombre = sc.nextLine();
         int clienteId = addCliente(nombre);
 
-        System.out.println("Ingrese cantidad de platos:");
-        int cant = sc.nextInt();
-        int[] platosIds = new int[cant];
-        for (int i = 0; i < cant; i++) {
-            System.out.println("Plato #" + (i + 1) + " (1.."+(nextPlatoId-1)+"):");
-            platosIds[i] = sc.nextInt();
+        // Mostrar platos disponibles antes de elegir
+        System.out.println("\nPlatos disponibles:");
+        for (int i = 1; i < nextPlatoId; i++) {
+            plato p = platos[i];
+            if (p != null)
+                System.out.println("  " + i + ") " + p.getNombre());
         }
 
-        System.out.println("Tipo: 0=llevar, 1=domicilio:");
+        System.out.print("\nIngrese la cantidad de platos: ");
+        int cant = sc.nextInt();
+        int[] platosIds = new int[cant];
+
+        for (int i = 0; i < cant; i++) {
+            System.out.print("Seleccione ID del plato #" + (i + 1) + ": ");
+            platosIds[i] = sc.nextInt();
+            if (platosIds[i] <= 0 || platosIds[i] >= nextPlatoId || platos[platosIds[i]] == null) {
+                System.out.println("ID inválido. Intente nuevamente.");
+                i--;
+            }
+        }
+
+        System.out.print("Tipo de pedido (0 = para llevar, 1 = domicilio): ");
         int tipo = sc.nextInt();
-        System.out.println("Prioridad: 1=VIP, 2=Normal:");
+
+        System.out.print("Prioridad (1 = VIP, 2 = Normal): ");
         int prioridad = sc.nextInt();
 
         int id = crearPedido(clienteId, platosIds, tipo, prioridad);
-        System.out.println("Pedido creado: #" + id);
+        System.out.println("\n✅ Pedido creado exitosamente: #" + id);
+        System.out.println(describirPedido(pedidos[id]));
     }
 
     public void verPendientes() {
