@@ -1,8 +1,6 @@
-package main.java.org.uade.util;
-
+package org.uade.util;
 import java.util.Scanner;
 import main.java.org.uade.service.*;
-
 import main.java.org.uade.model.pedido;
 
 public class Main {
@@ -23,12 +21,24 @@ public class Main {
             System.out.println("3. Procesar siguiente pedido en cocina");
             System.out.println("4. Marcar pedido LISTO (manual)");
             System.out.println("5. Encolar pedido LISTO para reparto");
-            System.out.println("6. Asignar pedido a repartidor");
+            System.out.println("6. Asignar pedido a repartidor (muestra camino más corto)");
             System.out.println("7. Finalizar entrega");
             System.out.println("8. Ver reportes");
             System.out.println("9. Salir");
+            System.out.println("10. Ver ubicaciones de repartidores");
+            System.out.println("11. Ver mapa de repartidores (vista gráfica)");
+            System.out.println("12. Ver pedidos entregados");
+            System.out.println("13. Cancelar pedido");
+            System.out.println("14. Ver pedidos en cocina");
+            System.out.println("15. Ver menú completo");
+            System.out.println("16. Agregar nuevo plato");
+            System.out.println("17. Agregar nuevo repartidor");
+
             System.out.print("Opción: ");
-            while (!sc.hasNextInt()) { sc.next(); System.out.print("Opción: "); }
+            while (!sc.hasNextInt()) {
+                sc.next();
+                System.out.print("Opción: ");
+            }
             opcion = sc.nextInt();
 
             switch (opcion) {
@@ -45,26 +55,29 @@ public class Main {
                     break;
 
                 case 4:
-                    System.out.println("ID de pedido a marcar LISTO:");
+                    System.out.print("ID de pedido a marcar LISTO: ");
                     int idListo = sc.nextInt();
                     gestorPedidos.marcarListo(idListo);
-                    System.out.println("Pedido #" + idListo + " marcado LISTO.");
+                    System.out.println("Pedido #" + idListo + " marcado como LISTO.");
                     break;
 
                 case 5:
-                    System.out.println("ID de pedido LISTO a encolar para reparto:");
+                    System.out.print("ID de pedido LISTO a encolar para reparto: ");
                     int idParaReparto = sc.nextInt();
                     if (gestorPedidos.getPedido(idParaReparto) != null &&
                             gestorPedidos.getPedido(idParaReparto).getEstado() == pedido.Estado.LISTO &&
                             gestorPedidos.getPedido(idParaReparto).getTipo() == pedido.TIPO_DOMICILIO) {
+
+                        // ✅ Se encola y se muestra la zona
                         gestorReparto.agregarPedidoListo(idParaReparto);
-                        System.out.println("Pedido #" + idParaReparto + " en cola de reparto.");
+                        System.out.println("Pedido #" + idParaReparto + " agregado a la cola de reparto.");
                     } else {
                         System.out.println("El pedido no está LISTO o no es a domicilio.");
                     }
                     break;
 
                 case 6:
+                    // ✅ Ahora al asignar, muestra el camino más corto con las zonas reales
                     gestorReparto.asignarPedido(gestorPedidos);
                     break;
 
@@ -78,6 +91,36 @@ public class Main {
 
                 case 9:
                     System.out.println("Cerrando sistema...");
+                    break;
+
+                case 10:
+                    gestorReparto.verUbicacionesRepartidores();
+                    break;
+                case 11:
+                    gestorReparto.mostrarMapaRepartidores();
+                    break;
+                case 12:
+                    gestorPedidos.verEntregados();
+                    break;
+
+                case 13:
+                    gestorPedidos.cancelarPedido(sc);
+                    break;
+
+                case 14:
+                    gestorPedidos.verEnCocina();
+                    break;
+
+                case 15:
+                    gestorPedidos.verMenu();
+                    break;
+
+                case 16:
+                    gestorPedidos.agregarPlato(sc);
+                    break;
+
+                case 17:
+                    gestorReparto.agregarRepartidor(sc);
                     break;
 
                 default:

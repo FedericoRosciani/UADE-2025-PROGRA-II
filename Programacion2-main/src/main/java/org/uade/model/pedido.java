@@ -7,7 +7,14 @@ public class pedido {
     public static final int PRIORIDAD_VIP = 1;     // menor número = mayor prioridad
     public static final int PRIORIDAD_NORMAL = 2;
 
-    public enum Estado { PENDIENTE, EN_COCINA, LISTO, ASIGNADO, ENTREGADO }
+    public enum Estado {
+        PENDIENTE,
+        EN_COCINA,
+        LISTO,
+        ASIGNADO,
+        ENTREGADO,
+        CANCELADO
+    }
 
     private final int id;
     private final int clienteId;
@@ -16,6 +23,10 @@ public class pedido {
     private final int prioridad;
     private Estado estado = Estado.PENDIENTE;
 
+    // 🔹 Nuevo atributo para grafo
+    private int destinoId = 0; // zona donde se entregará el pedido (1..15)
+
+    // --- Constructor ---
     public pedido(int id, int clienteId, int[] platosIds, int tipo, int prioridad) {
         this.id = id;
         this.clienteId = clienteId;
@@ -24,6 +35,7 @@ public class pedido {
         this.prioridad = prioridad;
     }
 
+    // --- Getters y setters ---
     public int getId() { return id; }
     public int getClienteId() { return clienteId; }
     public int[] getPlatosIds() { return platosIds; }
@@ -31,4 +43,8 @@ public class pedido {
     public int getPrioridad() { return prioridad; }
     public Estado getEstado() { return estado; }
     public void setEstado(Estado e) { this.estado = e; }
+
+    // 🔹 Nuevos métodos para el grafo
+    public int getDestinoId() { return destinoId; }
+    public void setDestinoId(int destinoId) { this.destinoId = destinoId; }
 }
