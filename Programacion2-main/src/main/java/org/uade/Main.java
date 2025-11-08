@@ -24,7 +24,7 @@ public class Main {
             System.out.println("6. Asignar pedido a repartidor (muestra camino más corto)");
             System.out.println("7. Finalizar entrega");
             System.out.println("8. Ver reportes");
-            System.out.println("9. Ver reportes");
+            System.out.println("9. proximamente");
             System.out.println("10. Ver ubicaciones de repartidores");
             System.out.println("11. Ver mapa de repartidores (vista gráfica)");
             System.out.println("12. Ver pedidos entregados");

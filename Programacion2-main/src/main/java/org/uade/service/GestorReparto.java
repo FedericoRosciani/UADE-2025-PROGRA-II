@@ -4,6 +4,9 @@ import java.util.Scanner;
 
 import main.java.org.uade.model.pedido;
 import main.java.org.uade.model.repartidor;
+import java.util.List;
+import java.util.ArrayList;
+
 
 import main.java.org.uade.structure.definition.QueueADT;
 import main.java.org.uade.structure.definition.SetADT;
@@ -105,6 +108,8 @@ public class GestorReparto {
     // --- Asignación de pedido a repartidor ---
 // --- Asignación inteligente de pedido a repartidor ---
 // --- Asignación automática: elige al repartidor más cercano y más libre ---
+// --- Asignación con entrega encadenada (agrupa pedidos cercanos) ---
+// --- Asignación con entrega encadenada (agrupa pedidos cercanos y muestra repartidor activo) ---
     public void asignarPedido(GestorPedido gestor) {
         if (pedidosListos.isEmpty()) {
             System.out.println("No hay pedidos listos para asignar.");
@@ -113,20 +118,10 @@ public class GestorReparto {
 
         int pedidoId = pedidosListos.getElement();
         pedidosListos.remove();
-
         pedido p = gestor.getPedido(pedidoId);
-        if (p == null) {
-            System.out.println("Pedido inexistente.");
-            return;
-        }
 
-        if (p.getTipo() != pedido.TIPO_DOMICILIO) {
-            System.out.println("El pedido #" + pedidoId + " es para llevar, no requiere reparto.");
-            return;
-        }
-
-        if (libres.isEmpty()) {
-            System.out.println("No hay repartidores disponibles. Pedido en espera.");
+        if (p == null || p.getTipo() != pedido.TIPO_DOMICILIO) {
+            System.out.println("Pedido inválido o no es a domicilio.");
             return;
         }
 
@@ -135,24 +130,20 @@ public class GestorReparto {
         int mejorDistancia = Integer.MAX_VALUE;
         int menorEntregas = Integer.MAX_VALUE;
 
-        // Buscar el repartidor más cercano y más libre
+        // Buscar repartidor más cercano al restaurante y con menos entregas
         for (int i = 1; i < nextRepartidorId; i++) {
             repartidor r = repartidores[i];
             if (r == null || !r.isDisponible()) continue;
-
-            int zonaRep = r.getUbicacionActual();
-            int distancia = calcularDistanciaMinima(zonaRep, ZONA_RESTAURANTE); // hasta el restaurante
-
-            if (distancia < mejorDistancia ||
-                    (distancia == mejorDistancia && r.getEntregas() < menorEntregas)) {
-                mejorDistancia = distancia;
+            int dist = calcularDistanciaMinima(r.getUbicacionActual(), ZONA_RESTAURANTE);
+            if (dist < mejorDistancia || (dist == mejorDistancia && r.getEntregas() < menorEntregas)) {
+                mejorDistancia = dist;
                 menorEntregas = r.getEntregas();
                 mejorRepartidor = i;
             }
         }
 
         if (mejorRepartidor == -1) {
-            System.out.println("No se encontró repartidor disponible para esa zona.");
+            System.out.println("No hay repartidores disponibles.");
             return;
         }
 
@@ -162,23 +153,68 @@ public class GestorReparto {
         pedido2repartidor.add(pedidoId, mejorRepartidor);
         p.setEstado(pedido.Estado.ASIGNADO);
 
-        // --- Simulación de recorrido ---
-        System.out.println("\n✅ Pedido #" + pedidoId + " asignado a " + elegido.getNombre() +
-                " (zona actual: " + zonas[elegido.getUbicacionActual()] + ")");
+        System.out.println("\n🚴‍♂️  Repartidor asignado: " + elegido.getNombre().toUpperCase());
+        System.out.println("Zona actual: " + zonas[elegido.getUbicacionActual()]);
+        System.out.println("Pedido principal: #" + pedidoId + " → " + zonas[zonaDestino]);
 
-        // 1️⃣ Ir desde su zona actual al restaurante
-        System.out.println("\n➡️  Repartidor " + elegido.getNombre() +
-                " se dirige al restaurante (" + zonas[ZONA_RESTAURANTE] + ")");
+        // Simular trayecto al restaurante
+        System.out.println("\n➡️  " + elegido.getNombre() + " se dirige al restaurante (" + zonas[ZONA_RESTAURANTE] + ")");
         mostrarCaminoMasCorto(elegido.getUbicacionActual(), ZONA_RESTAURANTE);
 
-        // 2️⃣ Luego desde el restaurante hasta el cliente
-        System.out.println("\n➡️  Repartidor toma el pedido y sale hacia el cliente (" + zonas[zonaDestino] + ")");
-        mostrarCaminoMasCorto(ZONA_RESTAURANTE, zonaDestino);
+        // --- Buscar pedidos adicionales cercanos al primero ---
+        List<Integer> pedidosAgrupados = new ArrayList<>();
+        pedidosAgrupados.add(pedidoId);
 
-        // 3️⃣ Actualizar su nueva ubicación
-        elegido.setUbicacionActual(zonaDestino);
+        QueueADT aux = new DynamicQueueADT();
+        while (!pedidosListos.isEmpty()) {
+            int otroId = pedidosListos.getElement();
+            pedidosListos.remove();
+            pedido otro = gestor.getPedido(otroId);
 
-        System.out.println("🚩 Pedido entregado en la zona: " + zonas[zonaDestino] + "\n");
+            if (otro != null && otro.getTipo() == pedido.TIPO_DOMICILIO) {
+                int dist = calcularDistanciaMinima(zonaDestino, otro.getDestinoId());
+                if (dist <= 3) { // <= 3 km de distancia, se agrupa
+                    pedidosAgrupados.add(otroId);
+                    otro.setEstado(pedido.Estado.ASIGNADO);
+                    pedido2repartidor.add(otroId, mejorRepartidor);
+                    System.out.println("📦 Pedido #" + otroId + " agregado a la misma entrega (zona cercana: " + zonas[otro.getDestinoId()] + ")");
+                } else {
+                    aux.add(otroId); // pedidos que quedan esperando
+                }
+            }
+        }
+
+        // Restaurar pedidos no usados
+        while (!aux.isEmpty()) {
+            pedidosListos.add(aux.getElement());
+            aux.remove();
+        }
+
+        // --- Mostrar resumen del reparto ---
+        System.out.println("\n🛵  " + elegido.getNombre() + " inicia recorrido con " + pedidosAgrupados.size() + " pedidos:");
+        for (int id : pedidosAgrupados) {
+            pedido ped = gestor.getPedido(id);
+            System.out.println("   • Pedido #" + id + " → Zona: " + zonas[ped.getDestinoId()]);
+        }
+
+        // --- Simular ruta de entrega múltiple ---
+        System.out.println("\n➡️  " + elegido.getNombre() + " toma los pedidos en el restaurante y comienza las entregas...");
+
+        for (int id : pedidosAgrupados) {
+            pedido ped = gestor.getPedido(id);
+            System.out.println("\n📍 Entregando pedido #" + id + " en " + zonas[ped.getDestinoId()]);
+            mostrarCaminoMasCorto(ZONA_RESTAURANTE, ped.getDestinoId());
+            ped.setEstado(pedido.Estado.ENTREGADO);
+            elegido.setUbicacionActual(ped.getDestinoId());
+            elegido.incEntregas();
+        }
+
+        elegido.setDisponible(true);
+        ocupados.remove(mejorRepartidor);
+        libres.add(mejorRepartidor);
+
+        System.out.println("\n✅ Entregas completadas por " + elegido.getNombre() +
+                ". Repartidor finalizó en zona " + zonas[elegido.getUbicacionActual()] + ".\n");
     }
 
     // --- Mostrar camino más corto entre zonas (versión simple) ---
