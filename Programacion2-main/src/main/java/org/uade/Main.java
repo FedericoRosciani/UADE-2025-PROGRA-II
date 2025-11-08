@@ -36,7 +36,7 @@ public class Main {
         System.out.println(" 17) Agregar nuevo repartidor\n");
 
         System.out.println(" 🚪  SALIDA");
-        System.out.println(" 19) Salir");
+        System.out.println(" 18) Salir");
         System.out.print("\nSeleccione una opción: ");
     }
 
@@ -102,7 +102,7 @@ public class Main {
                 case 17 -> gestorReparto.agregarRepartidor(sc);
 
                 // === SALIR ===
-                case 19 -> System.out.println("Cerrando sistema...");
+                case 18 -> System.out.println("Cerrando sistema...");
 
                 // === DEFAULT ===
                 default -> System.out.println("Opción inválida. Intente nuevamente.");
