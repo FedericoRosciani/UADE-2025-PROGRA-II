@@ -1,3 +1,25 @@
-# Default ignored files
-/shelf/
-/workspace.xml
+# ==== ARCHIVOS DEL IDE (IntelliJ / Eclipse / NetBeans) ====
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+
+# ==== BUILD / COMPILACIÓN ====
+target/
+bin/
+out/
+
+# ==== ARCHIVOS DEL SISTEMA ====
+.DS_Store
+Thumbs.db
+
+# ==== ARCHIVOS TEMPORALES ====
+*.log
+*.tmp
+
+# ==== ARCHIVOS DE JAVA ====
+*.class
+
+# ==== CONFIG PERSONALES ====
+*.env
