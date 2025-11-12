@@ -23,6 +23,7 @@ Uso de estructuras de datos (TDAs) construidas por el grupo
 El proyecto está desarrollado en Java aplicando TDAs personalizados, sin usar colecciones nativas de Java.
 
 TDAs utilizados y motivo de selección
+
 1. PriorityQueueADT (Cola con prioridad)
 
 Dónde se usa:
@@ -153,4 +154,4 @@ Se incluyen tests con JUnit para validar:
 
 Que un pedido VIP se procesa antes que uno Normal.
 
-Que un pedido solo puede pasar a LISTO si estuvo antes en cocina.
+Agregar un plato correctamente.
