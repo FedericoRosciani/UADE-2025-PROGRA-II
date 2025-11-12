@@ -66,8 +66,7 @@ public class Main {
                 case 4 -> {
                     System.out.print("ID de pedido a marcar LISTO: ");
                     int idListo = sc.nextInt();
-                    gestorPedidos.marcarListo(idListo);
-                    System.out.println("Pedido #" + idListo + " marcado como LISTO.");
+                    gestorPedidos.marcarListo(idListo); // El método ya imprime el mensaje correcto
                 }
                 case 5 -> {
                     System.out.print("ID de pedido LISTO a encolar para reparto: ");

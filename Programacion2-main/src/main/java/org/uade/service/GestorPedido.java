@@ -254,8 +254,24 @@ public class GestorPedido {
 
     public void marcarListo(int pedidoId) {
         pedido p = pedidos[pedidoId];
-        if (p != null) p.setEstado(pedido.Estado.LISTO);
+
+        if (p == null) {
+            System.out.println("❌ Pedido inexistente.");
+            return;
+        }
+
+        // Solo se puede marcar como LISTO si está en cocina
+        if (p.getEstado() == pedido.Estado.EN_COCINA) {
+            p.setEstado(pedido.Estado.LISTO);
+            System.out.println("✅ Pedido #" + pedidoId + " marcado como LISTO.");
+        }
+        else {
+            System.out.println("⚠ No se puede marcar como LISTO.");
+            System.out.println("   Estado actual: " + p.getEstado());
+            System.out.println("   Solo los pedidos en cocina pueden pasar a LISTO.");
+        }
     }
+
 
     public pedido getPedido(int id) { return pedidos[id]; }
 

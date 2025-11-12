@@ -10,9 +10,10 @@ public class GestorCocina {
             System.out.println("No hay pedidos en espera.");
             return;
         }
+
         pedido p = gestor.getPedido(id);
-        // Simulación simple: procesar todos los platos y marcar listo
-        gestor.marcarListo(id);
-        System.out.println("Pedido #" + id + " listo en cocina.");
+
+        // AHORA el pedido queda EN_COCINA, NO lo marcamos LISTO acá.
+        System.out.println("Pedido #" + id + " está siendo preparado en cocina.");
     }
 }
