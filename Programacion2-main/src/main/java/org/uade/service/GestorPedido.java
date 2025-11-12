@@ -60,17 +60,34 @@ public class GestorPedido {
     }
 
     private void precargarPedidosDemo() {
-        // Crea 5 pedidos de demo
-        for (int i = 0; i < 5; i++) {
-            int cliente = 1 + (i % 3);
-            int tipo = (i % 2 == 0) ? pedido.TIPO_DOMICILIO : pedido.TIPO_LLEVAR;
-            int prioridad = (i % 3 == 0) ? pedido.PRIORIDAD_VIP : pedido.PRIORIDAD_NORMAL;
-            int[] arrPlatos = new int[]{1 + (i % (nextPlatoId - 1 == 0 ? 1 : nextPlatoId - 1))};
-            int id = crearPedido(cliente, arrPlatos, tipo, prioridad);
-            if (tipo == pedido.TIPO_DOMICILIO) {
-                pedidos[id].setDestinoId(1 + (i % 5)); // Palermo..Retiro para demo
-            }
-        }
+        System.out.println("📦 Cargando pedidos de ejemplo...");
+
+        // Nombres más realistas
+        int cliente1 = addCliente("Juan Pérez");
+        int cliente2 = addCliente("María López");
+        int cliente3 = addCliente("Carlos Fernández");
+
+        // Crear pedidos con direcciones (zonas reales)
+        // Zonas: 1=Palermo, 2=Recoleta, 3=Almagro, 4=Belgrano, 5=Retiro,
+        //        6=San Telmo, 7=Caballito, 8=Flores, 9=Núñez, 10=Puerto Madero,
+        //        11=La Boca, 12=Liniers, 13=Saavedra, 14=Mataderos, 15=Villa Urquiza
+
+        int id1 = crearPedido(cliente1, new int[]{1}, pedido.TIPO_DOMICILIO, pedido.PRIORIDAD_VIP);
+        getPedido(id1).setDestinoId(7); // Caballito
+
+        int id2 = crearPedido(cliente2, new int[]{2}, pedido.TIPO_LLEVAR, pedido.PRIORIDAD_NORMAL);
+        // Llevar → no tiene destino
+
+        int id3 = crearPedido(cliente3, new int[]{3}, pedido.TIPO_DOMICILIO, pedido.PRIORIDAD_NORMAL);
+        getPedido(id3).setDestinoId(8); // Flores
+
+        int id4 = crearPedido(cliente1, new int[]{4}, pedido.TIPO_LLEVAR, pedido.PRIORIDAD_VIP);
+        // Llevar → no tiene destino
+
+        int id5 = crearPedido(cliente2, new int[]{5}, pedido.TIPO_DOMICILIO, pedido.PRIORIDAD_NORMAL);
+        getPedido(id5).setDestinoId(6); // San Telmo
+
+        System.out.println("✅ Pedidos precargados correctamente.\n");
     }
 
     public int addCliente(String nombre) {
@@ -97,7 +114,8 @@ public class GestorPedido {
         idxPedido.add(id, id);           // id -> id (índice = id)
         pedidosPorCliente.add(clienteId, id);
         // registrar en cola por prioridad
-        colaPrioridad.add(id, prioridad);
+        // registrar en cola por prioridad (VIP primero)
+        colaPrioridad.add(id, -prioridad);
         // conteo platos
         for (int pid : platosIds) {
             int actual = 0;

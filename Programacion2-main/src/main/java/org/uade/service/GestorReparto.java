@@ -75,21 +75,13 @@ public class GestorReparto {
 
     // --- Precarga de repartidores ---
     private void precargarRepartidores() {
-        // 10 repartidores distribuidos en zonas distintas (1..15)
-        int[] zonasAsignadas = {1, 2, 3, 4, 5, 6, 8, 10, 12, 14};
-
         for (int i = 0; i < 10; i++) {
             int id = addRepartidor("Repartidor " + (i + 1));
-            repartidores[id].setUbicacionActual(zonasAsignadas[i]);
+            // Todos salen desde el local (Palermo = ZONA_RESTAURANTE)
+            repartidores[id].setUbicacionActual(ZONA_RESTAURANTE);
             libres.add(id);
         }
-
-        System.out.println("Se cargaron 10 repartidores distribuidos en distintas zonas de Buenos Aires:");
-        for (int i = 1; i <= 10; i++) {
-            repartidor r = repartidores[i];
-            if (r != null)
-                System.out.println(" - " + r.getNombre() + " en zona " + zonas[r.getUbicacionActual()]);
-        }
+        System.out.println("✅ Repartidores inicializados: todos parten desde " + zonas[ZONA_RESTAURANTE]);
     }
 
 
