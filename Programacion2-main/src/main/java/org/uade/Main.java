@@ -103,7 +103,7 @@ public class Main {
                 // === SALIR ===
                 case 18 -> System.out.println("Cerrando sistema...");
 
-                // === DEFAULT ===
+                // === invalida opcion ===
                 default -> System.out.println("Opción inválida. Intente nuevamente.");
             }
 
