@@ -1,5 +1,17 @@
 package main.java.org.uade.util;
 
+import main.java.org.uade.model.Cliente;
+import main.java.org.uade.model.pedido;
+import main.java.org.uade.model.plato;
+import main.java.org.uade.model.repartidor;
+
+import main.java.org.uade.service.GestorPedido;
+import main.java.org.uade.service.GestorReparto;
+import main.java.org.uade.service.GestorCocina;
+import main.java.org.uade.service.Reporte;
+
+import java.util.Scanner;
+
 import java.util.Scanner;
 import main.java.org.uade.service.*;
 import main.java.org.uade.model.pedido;
@@ -19,7 +31,7 @@ public class Main {
         System.out.println("  6) Asignar pedido a repartidor (muestra camino más corto)");
         System.out.println("  7) Take Away");
         System.out.println("  8) Ver reportes");
-        System.out.println("  9) Funcionalidad en desarrollo\n");
+        System.out.println("  9) Resumen general del sistema\n");
 
         System.out.println(" 🛵  REPARTIDORES");
         System.out.println(" 10) Ver ubicaciones de repartidores");
@@ -84,7 +96,40 @@ public class Main {
                 case 6 -> gestorReparto.asignarPedido(gestorPedidos);
                 case 7 -> gestorReparto.finalizarEntrega(sc, gestorPedidos);
                 case 8 -> reportes.mostrarReportes(gestorPedidos, gestorReparto);
-                case 9 -> System.out.println("Funcionalidad en desarrollo...");
+                case 9 -> {
+                    System.out.println("\n===== REPORTE GENERAL DEL SISTEMA =====");
+
+                    int pendientes = gestorPedidos.contarPendientesDespacho();
+                    int finalizados = gestorPedidos.contarFinalizados();
+
+                    int mejorClienteId = gestorPedidos.clienteConMasPedidos();
+                    int mejorPlatoId = gestorPedidos.platoMasPedido();
+
+                    // --- Datos base ---
+                    System.out.println("Pedidos pendientes de despacho: " + pendientes);
+                    System.out.println("Pedidos finalizados (entregados): " + finalizados);
+
+                    // --- Mejor cliente ---
+                    if (mejorClienteId != -1) {
+                        Cliente cli = gestorPedidos.getCliente(mejorClienteId);
+                        System.out.println("Cliente con más pedidos: " + cli.getNombre() + " (ID " + mejorClienteId + ")");
+                    } else {
+                        System.out.println("Cliente con más pedidos: N/A");
+                    }
+
+                    // --- Plato más pedido ---
+                    if (mejorPlatoId != -1) {
+                        plato pl = gestorPedidos.getPlato(mejorPlatoId);
+                        System.out.println("Plato más pedido: " + pl.getNombre());
+                    } else {
+                        System.out.println("Plato más pedido: N/A");
+                    }
+
+                    System.out.println("Fecha de generación del reporte: " + java.time.LocalDateTime.now());
+                    System.out.println("=========================================\n");
+                }
+
+
 
                 // === REPARTIDORES ===
                 case 10 -> gestorReparto.verUbicacionesRepartidores();
@@ -108,7 +153,7 @@ public class Main {
             }
 
         } while (opcion != 18);
-        // === para salir ===
+        // === para salir1 ===
 
         sc.close();
     }
