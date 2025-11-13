@@ -108,6 +108,7 @@ public class Main {
             }
 
         } while (opcion != 18);
+        // === para salir ===
 
         sc.close();
     }
