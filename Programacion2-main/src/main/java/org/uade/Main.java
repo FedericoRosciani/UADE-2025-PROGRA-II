@@ -107,7 +107,7 @@ public class Main {
                 default -> System.out.println("Opción inválida. Intente nuevamente.");
             }
 
-        } while (opcion != 19);
+        } while (opcion != 18);
 
         sc.close();
     }
